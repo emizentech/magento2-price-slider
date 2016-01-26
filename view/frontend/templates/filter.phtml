@@ -1,0 +1,83 @@
+<?php
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php
+/**
+ * Template for filter items block
+ *
+ * @var $block \Magento\LayeredNavigation\Block\Navigation\FilterRenderer
+ */
+?>
+<?php
+
+
+?>
+<?php if($filter->getName() == 'Price' ):?>
+<?php $range =  $this->getPriceRange($filter);?>
+<?php $url = $this->getFilterUrl($filter);?>
+<?php //var_dump($url);?>
+<script>
+var price_url = "<?=$url;?>";
+require([
+    'jquery',
+    "jquery/ui",
+    'domReady!'
+], function($){
+//     `use strict`;
+    console.log("Price Slider..!");
+//require(["jquery" , "jquery/jquery-ui"], function($){
+    // ...
+    $("div#price-slider").slider({
+			range: true,
+			min: <?=$range['min']?>,
+			max: <?=$range['max']?>,
+			values: [ <?=$range['min']?>, <?=$range['max']?> ],
+			slide: function( event, ui ) {
+				$( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
+			},
+			change: function( event, ui ) {
+				//alert(ui.values[0]+"~"+ui.values[1]);
+				window.location.href = price_url+ui.values[0]+"-"+ui.values[1];
+			}
+		});
+		$( "#amount" ).val( "$" + $( "#price-slider" ).slider( "values", 0 ) +
+			" - $" + $( "#price-slider" ).slider( "values", 1 ) );
+});
+</script>
+<?php 
+?>      
+<p>
+	<label for="amount">Price range:</label>
+	<input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+</p>
+<div id="price-slider"></div>
+
+<?php else:?>
+<ol class="items">
+    <?php foreach ($filterItems as $filterItem): ?>
+        <li class="my item">
+            <?php if ($filterItem->getCount() > 0): ?>
+                <a href="<?php echo $block->escapeUrl($filterItem->getUrl()) ?>">
+                    <?php /* @escapeNotVerified */ echo $filterItem->getLabel() ?>
+                    <?php if ($this->helper('\Magento\Catalog\Helper\Data')->shouldDisplayProductCountOnLayer()): ?>
+                        <span class="count"><?php /* @escapeNotVerified */ echo $filterItem->getCount()?><span class="filter-count-label">
+                            <?php if ($filterItem->getCount() == 1):?> <?php /* @escapeNotVerified */ echo __('item')?><?php else:?> <?php /* @escapeNotVerified */ echo __('items') ?><?php endif;?></span></span>
+                    <?php endif; ?>
+                </a>
+            <?php else:?>
+                <?php /* @escapeNotVerified */ echo $filterItem->getLabel() ?>
+                <?php if ($this->helper('\Magento\Catalog\Helper\Data')->shouldDisplayProductCountOnLayer()): ?>
+                    <span class="count"><?php /* @escapeNotVerified */ echo $filterItem->getCount()?><span class="filter-count-label">
+                        <?php if ($filterItem->getCount() == 1):?><?php /* @escapeNotVerified */ echo __('item')?><?php else:?><?php /* @escapeNotVerified */ echo __('items') ?><?php endif;?></span></span>
+                <?php endif; ?>
+            <?php endif; ?>
+        </li>
+    <?php endforeach ?>
+</ol>
+<?php endif;?>
