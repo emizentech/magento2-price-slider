@@ -8,24 +8,22 @@
 namespace Emizentech\Priceslider\Block;
 
 use Magento\Catalog\Model\Layer\Filter\FilterInterface;
-use Magento\Framework\View\Element\Template;
-use Magento\LayeredNavigation\Block\Navigation\FilterRendererInterface;
 
-class FilterRenderer extends Template implements FilterRendererInterface
+class FilterRenderer extends \Magento\LayeredNavigation\Block\Navigation\FilterRenderer
 {
     /**
      * @param FilterInterface $filter
      * @return string
      */
     public function render(FilterInterface $filter)
-    {	
+    {
         $this->assign('filterItems', $filter->getItems());
         $this->assign('filter' , $filter);
         $html = $this->_toHtml();
         $this->assign('filterItems', []);
         return $html;
     }
-    
+
     public function getPriceRange($filter){
     	$Filterprice = array('min' => 0 , 'max'=>0);
     	if($filter->getName() == 'Price' ){
@@ -35,7 +33,7 @@ class FilterRenderer extends Template implements FilterRendererInterface
     	}
     	return $Filterprice;
     }
-    
+
     public function getFilterUrl($filter){
     		$query = ['price'=> ''];
     	 return $this->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true, '_query' => $query]);
