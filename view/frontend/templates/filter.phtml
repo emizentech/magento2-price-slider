@@ -18,7 +18,7 @@
 
 
 ?>
-<?php if($filter->getName() == 'Price' ):?>
+<?php if($filter instanceof Magento\CatalogSearch\Model\Layer\Filter\Price ):?>
 <?php $range =  $this->getPriceRange($filter);?>
 <?php $url = $this->getFilterUrl($filter);?>
 <?php //var_dump($url);?>
