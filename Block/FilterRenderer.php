@@ -1,9 +1,6 @@
 <?php
 /**
  * Catalog layer filter renderer
- *
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
  */
 namespace Emizentech\Priceslider\Block;
 
@@ -11,6 +8,18 @@ use Magento\Catalog\Model\Layer\Filter\FilterInterface;
 
 class FilterRenderer extends \Magento\LayeredNavigation\Block\Navigation\FilterRenderer
 {
+    protected $currency;
+
+    public function __construct(
+        \Magento\Backend\Block\Template\Context $context,
+        \Magento\Directory\Model\Currency $currency,
+        array $data = []
+    )
+    {
+        $this->currency = $currency;
+        parent::__construct($context, $data);
+    }
+
     /**
      * @param FilterInterface $filter
      * @return string
@@ -25,17 +34,37 @@ class FilterRenderer extends \Magento\LayeredNavigation\Block\Navigation\FilterR
     }
 
     public function getPriceRange($filter){
-    	$Filterprice = array('min' => 0 , 'max'=>0);
-    	if($filter instanceof Magento\CatalogSearch\Model\Layer\Filter\Price){
-			$priceArr = $filter->getResource()->loadPrices(10000000000);
-     		$Filterprice['min'] = reset($priceArr);
-     		$Filterprice['max'] = end($priceArr);
-    	}
-    	return $Filterprice;
+        $filterprice = array('min' => 0 , 'max' => 0);
+        if($filter instanceof \Magento\CatalogSearch\Model\Layer\Filter\Price){
+            $priceArr = $filter->getResource()->loadPrices(10000000000);
+            $filterprice['min'] = reset($priceArr);
+            $filterprice['max'] = end($priceArr);
+        }
+        return $filterprice;
     }
 
     public function getFilterUrl($filter){
-    		$query = ['price'=> ''];
-    	 return $this->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true, '_query' => $query]);
+        $query = ['price'=> ''];
+        return $this->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true, '_query' => $query]);
+    }
+
+    /**
+     * Get current store currency code
+     *
+     * @return string
+     */
+    public function getCurrentCurrencyCode()
+    {
+        return $this->_storeManager->getStore()->getCurrentCurrencyCode();
+    }
+
+    /**
+     * Get currency symbol for current locale and currency code
+     *
+     * @return string
+     */
+    public function getCurrentCurrencySymbol()
+    {
+        return $this->currency->getCurrencySymbol();
     }
 }
