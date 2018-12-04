@@ -21,8 +21,32 @@ define([
        return Number(highest .value.replace('-', ''));
     },
     
-    _goToFilteredView: function () {
+    _goToFilteredView: function (min, max) {
+      var current = window.location.href,
+          params = window.location.search,
+          suffix = params.indexOf('?') >= 0 ? '&':'?'
+      if (params.indexOf('price=')>= 0)  {
+        current = this._removeParams('price', current)
+      }
+      window.location.href = current + suffix + 'price='+ min + '-'+ max
+    },
     
+    _removeParams: function (key, url) {
+      var rtn = url.split('?')[0],
+          param,
+          params_arr = [],
+          queryString = (url.indexOf('?') !== -1) ? url.split('?')[1] : '';
+      if (queryString !== '') {
+        params_arr = queryString.split('&');
+        for (var i = params_arr.length - 1; i >= 0; i -= 1) {
+          param = params_arr[i].split('=')[0];
+          if (param === key) {
+            params_arr.splice(i, 1);
+          }
+        }
+        rtn = rtn + '?' + params_arr.join('&');
+      }
+      return rtn;
     },
   
     /**
@@ -55,9 +79,9 @@ define([
           $widget._setInputValues(ui.values[0],ui.values[1])
         },
         change: function( event, ui ) {
-          console.log('change')
-          console.log(ui)
-          // window.location.href = price_url+ui.values[0]+"-"+ui.values[1];
+          setTimeout(function(){
+            $widget._goToFilteredView(ui.values[0],ui.values[1])
+          },10);
         }
       })
     }
