@@ -9,28 +9,41 @@ define([
       console.log(this.options)
       this._initSlider()
       this._setInputValues()
+      // this._onInputChange()
+    },
+  
+    _goToFilteredView: function (min, max) {
+      var current = window.location.href,
+        suffix = window.location.search.indexOf('?') >= 0 ? '&':'?'
+      if (this._isPriceFiltered())  {
+        current = this._removeParams('price', current)
+      }
+      var priceRange = ''
+      $.each(this.options.values, function(index, range) {
+        minOfRange = range.value.split('-')[0] !== '' ? range.value.split('-')[0] : range.value.split('-')[1] -10
+        maxOfRange = range.value.split('-')[1] !== '' ? range.value.split('-')[1] : range.value.split('-')[0] +10
+        if (max >= minOfRange && min <= maxOfRange) {
+          priceRange += range.value + '_'
+        }
+      });
+      setTimeout(function(){
+        window.location.href = current + suffix + 'price='+ priceRange
+      },10);
     },
     
     _getMinValue: function () {
       var lowest = this.options.values[0]
-      return Number(lowest.value.replace('-', ''));
+      return Number(lowest.value.replace('-', '')) - 10;
     },
     
     _getMaxValue: function () {
        var highest = this.options.values.slice(-1)[0]
-       return Number(highest .value.replace('-', ''));
+       return Number(highest.value.replace('-', '')) + 10;
     },
-    
-    _goToFilteredView: function (min, max) {
-      var current = window.location.href,
-          params = window.location.search,
-          suffix = params.indexOf('?') >= 0 ? '&':'?'
-      if (this._isPriceFiltered())  {
-        current = this._removeParams('price', current)
-      }
-      console.log(min)
-      console.log(max)
-      //window.location.href = current + suffix + 'price='+ min + '-'+ max
+  
+    _isPriceFiltered() {
+      var params = window.location.search
+      return params.indexOf('price=')>= 0
     },
     
     _removeParams: function (key, url) {
@@ -50,28 +63,16 @@ define([
       }
       return cleanedUrl;
     },
-    
-    _isPriceFiltered() {
-      var params = window.location.search
-      return params.indexOf('price=')>= 0
-    },
   
-    /**
-     * TODO: ADD translations
-     * @param min
-     * @param max
-     * @private
-     */
+    _onInputChange: function () {
+      $('.price-range-input').bind('input', function() {
+         // on input do soething
+      });
+    },
     
     _setInputValues: function (min, max) {
-      if (typeof min === 'undefined' || min === this._getMinValue()) {
-        min = this._isPriceFiltered() ? this._getMinValue() : (this._getMinValue() - 10)
-      }
-      if (typeof max === 'undefined' || max === this._getMaxValue()) {
-        max = this._isPriceFiltered() ? this._getMaxValue() : (this._getMaxValue() + 10)
-      }
-      $('#min-price').val(min)
-      $('#max-price').val(max)
+      $('#min-price').val(min || this._getMinValue())
+      $('#max-price').val(max || this._getMaxValue())
     },
   
     /**
@@ -85,15 +86,12 @@ define([
         range: true,
         min: this._getMinValue(),
         max: this._getMaxValue(),
-        values: [ this._getMinValue(), this._getMaxValue() ],
+        values: [ this._getMinValue(), this._getMaxValue()],
         slide: function( event, ui ) {
-          console.log(ui)
           $widget._setInputValues(ui.values[0],ui.values[1])
         },
         change: function( event, ui ) {
-          setTimeout(function(){
-            $widget._goToFilteredView(ui.values[0],ui.values[1])
-          },10);
+          $widget._goToFilteredView(ui.values[0],ui.values[1])
         }
       })
     }
