@@ -25,14 +25,16 @@ define([
       var current = window.location.href,
           params = window.location.search,
           suffix = params.indexOf('?') >= 0 ? '&':'?'
-      if (params.indexOf('price=')>= 0)  {
+      if (this._isPriceFiltered())  {
         current = this._removeParams('price', current)
       }
-      window.location.href = current + suffix + 'price='+ min + '-'+ max
+      console.log(min)
+      console.log(max)
+      //window.location.href = current + suffix + 'price='+ min + '-'+ max
     },
     
     _removeParams: function (key, url) {
-      var rtn = url.split('?')[0],
+      var cleanedUrl = url.split('?')[0],
           param,
           params_arr = [],
           queryString = (url.indexOf('?') !== -1) ? url.split('?')[1] : '';
@@ -44,9 +46,14 @@ define([
             params_arr.splice(i, 1);
           }
         }
-        rtn = rtn + '?' + params_arr.join('&');
+        cleanedUrl = cleanedUrl + '?' + params_arr.join('&');
       }
-      return rtn;
+      return cleanedUrl;
+    },
+    
+    _isPriceFiltered() {
+      var params = window.location.search
+      return params.indexOf('price=')>= 0
     },
   
     /**
@@ -57,10 +64,14 @@ define([
      */
     
     _setInputValues: function (min, max) {
-      var minLabel = typeof min === 'undefined' || min ===  this._getMinValue() ? 'Meno di ' + this._getMinValue() : min
-      var maxLabel = typeof max === 'undefined' || max ===  this._getMaxValue() ? 'Più di ' + this._getMaxValue() : max
-      $('#min-price').val(minLabel + '€')
-      $('#max-price').val(maxLabel + '€')
+      if (typeof min === 'undefined' || min === this._getMinValue()) {
+        min = this._isPriceFiltered() ? this._getMinValue() : (this._getMinValue() - 10)
+      }
+      if (typeof max === 'undefined' || max === this._getMaxValue()) {
+        max = this._isPriceFiltered() ? this._getMaxValue() : (this._getMaxValue() + 10)
+      }
+      $('#min-price').val(min)
+      $('#max-price').val(max)
     },
   
     /**
@@ -76,6 +87,7 @@ define([
         max: this._getMaxValue(),
         values: [ this._getMinValue(), this._getMaxValue() ],
         slide: function( event, ui ) {
+          console.log(ui)
           $widget._setInputValues(ui.values[0],ui.values[1])
         },
         change: function( event, ui ) {
