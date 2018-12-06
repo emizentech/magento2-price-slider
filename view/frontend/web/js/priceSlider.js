@@ -6,10 +6,9 @@ define([
   $.widget('bitbull.priceSlider', {
   
     _init: function() {
-      console.log(this.options)
       this._initSlider()
       this._setInputValues()
-      // this._onInputChange()
+      this._onInputChange()
     },
   
     _goToFilteredView: function (min, max) {
@@ -22,7 +21,7 @@ define([
       $.each(this.options.values, function(index, range) {
         minOfRange = range.value.split('-')[0] !== '' ? range.value.split('-')[0] : range.value.split('-')[1] -10
         maxOfRange = range.value.split('-')[1] !== '' ? range.value.split('-')[1] : range.value.split('-')[0] +10
-        if (max >= minOfRange && min <= maxOfRange) {
+        if (max > minOfRange && min < maxOfRange) {
           priceRange += range.value + '_'
         }
       });
@@ -66,7 +65,9 @@ define([
   
     _onInputChange: function () {
       $('.price-range-input').bind('input', function() {
-         // on input do soething
+         $('#slider-price').slider({
+           values: [ $('#min-price').val(), $('#max-price').val()]
+         });
       });
     },
     

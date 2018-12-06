@@ -2,6 +2,18 @@
  #slider-price {
    clear: both;
  }
+ .filter-price-error,
+ .trigger-filter-price {
+   display: none;
+   text-align: center;
+   padding: 10px 0;
+   &.visible {
+     display: block;
+   }
+ }
+ .filter-price-error  {
+   color: red;
+ }
  input#min-price,
  input#max-price {
    padding: 0 3px;
