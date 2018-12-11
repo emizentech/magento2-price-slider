@@ -4,12 +4,24 @@ define([
     'domReady!'
 ], function($){
   $.widget('bitbull.priceSlider', {
-  
+    
     _init: function() {
-      this._initSlider()
-      this._setInputValues()
-      this._onInputChange()
+      var range = this._getSelectedRange()
+      this._onInputChange() // On value change
+      this._setCurrentRange() // Set current price range if filter is active
+      if(this._isPriceFiltered()) { // Set values in inputs
+        this._setInputValues(range[0],range[1])
+      } else {
+        this._setInputValues()
+      }
+      this._initSlider() // Init slider
     },
+  
+    /**
+     * Redirect to the viltered view
+     * @param min
+     * @param max
+     */
   
     _goToFilteredView: function (min, max) {
       var current = window.location.href,
@@ -19,8 +31,8 @@ define([
       }
       var priceRange = ''
       $.each(this.options.values, function(index, range) {
-        minOfRange = range.value.split('-')[0] !== '' ? range.value.split('-')[0] : range.value.split('-')[1] -10
-        maxOfRange = range.value.split('-')[1] !== '' ? range.value.split('-')[1] : range.value.split('-')[0] +10
+        minOfRange = range.value.split('-')[0] !== '' ? range.value.split('-')[0] : Number(range.value.split('-')[1]) -10
+        maxOfRange = range.value.split('-')[1] !== '' ? range.value.split('-')[1] : Number(range.value.split('-')[0]) +10
         if (max > minOfRange && min < maxOfRange) {
           priceRange += range.value + '_'
         }
@@ -29,21 +41,65 @@ define([
         window.location.href = current + suffix + 'price='+ priceRange
       },10);
     },
+  
+    /**
+     * Get range of selected price
+     * @returns {*}
+     */
+    
+    _getSelectedRange() {
+      var values = this.options.values,
+          selectedRange = []
+      if (this._isPriceFiltered())  {
+        $.each(values, function(index, range) {
+          if (range.is_selected) {
+            selectedRange.push(values[index].value)
+          }
+        });
+        var length = selectedRange.length -1,
+            min = selectedRange[0].split('-')[0] === '' ? this._getMinValue() : Number(selectedRange[0].split('-')[0])
+            max = selectedRange[length].split('-')[1] === '' ? this._getMaxValue() : Number(selectedRange[length].split('-')[1])
+        return [min, max]
+      } else {
+        return null
+      }
+    },
+  
+    /**
+     * Get min value in current category
+     * @returns {number}
+     */
     
     _getMinValue: function () {
       var lowest = this.options.values[0]
       return Number(lowest.value.replace('-', '')) - 10;
     },
+  
+    /**
+     * Get max value in current category
+     * @returns {number}
+     */
     
     _getMaxValue: function () {
        var highest = this.options.values.slice(-1)[0]
        return Number(highest.value.replace('-', '')) + 10;
     },
   
+    /**
+     * Is category filtered for price?
+     * @returns {boolean}
+     */
+  
     _isPriceFiltered() {
       var params = window.location.search
       return params.indexOf('price=')>= 0
     },
+  
+    /**
+     * Remove parameter from url
+     * @param key
+     * @param url
+     */
     
     _removeParams: function (key, url) {
       var cleanedUrl = url.split('?')[0],
@@ -63,6 +119,10 @@ define([
       return cleanedUrl;
     },
   
+    /**
+     * Event listener to change range from inputs
+     */
+  
     _onInputChange: function () {
       $('.price-range-input').bind('input', function() {
          $('#slider-price').slider({
@@ -70,10 +130,30 @@ define([
          });
       });
     },
+  
+    /**
+     * Set starting values
+     * @param min
+     * @param max
+     */
     
     _setInputValues: function (min, max) {
       $('#min-price').val(min || this._getMinValue())
       $('#max-price').val(max || this._getMaxValue())
+    },
+  
+    /**
+     * Set custom current range instead of default ranges in selected filters box
+     * //TODO: translate
+     * @private
+     */
+    
+    _setCurrentRange () {
+      var range = this._getSelectedRange()
+      if (range !== null) {
+        $('#selected-price-range').html('Da' + range[0] + '€ a ' + range[1] +'€')
+      }
+      
     },
   
     /**
@@ -82,12 +162,13 @@ define([
      */
     
     _initSlider: function () {
-      var $widget = this
+      var $widget = this,
+          range = this._getSelectedRange()
       $('#slider-price').slider({
         range: true,
         min: this._getMinValue(),
         max: this._getMaxValue(),
-        values: [ this._getMinValue(), this._getMaxValue()],
+        values: range === null ? [ this._getMinValue(), this._getMaxValue()] : range,
         slide: function( event, ui ) {
           $widget._setInputValues(ui.values[0],ui.values[1])
         },
