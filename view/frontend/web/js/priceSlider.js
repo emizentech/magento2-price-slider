@@ -1,13 +1,14 @@
 define([
     'jquery',
     'jquery/ui',
-    'domReady!'
+    'domReady!',
+    'touchSupport'
 ], function($){
   $.widget('bitbull.priceSlider', {
     
     _init: function() {
       var range = this._getSelectedRange()
-      this._onInputChange() // On value change
+      this.onEventListeners()
       this._setCurrentRange() // Set current price range if filter is active
       if(this._isPriceFiltered()) { // Set values in inputs
         this._setInputValues(range[0],range[1])
@@ -15,6 +16,23 @@ define([
         this._setInputValues()
       }
       this._initSlider() // Init slider
+    },
+  
+    /**
+     * Event listeners
+     */
+
+    onEventListeners: function () {
+      var that = this
+      $(".go-to-price").click(function() {
+        that._goToFilteredView($('#min-price').val(), $('#max-price').val())
+      });
+      $('.price-range-input').bind('input', function() {
+        $(".go-to-price").show()
+        $('#slider-price').slider({
+          values: [ $('#min-price').val(), $('#max-price').val()]
+        });
+      });
     },
   
     /**
@@ -27,8 +45,11 @@ define([
       var current = window.location.href,
         suffix = window.location.search.indexOf('?') >= 0 ? '&':'?'
       if (this._isPriceFiltered())  {
+        console.log('is filtered')
         current = this._removeParams('price', current)
       }
+      console.log(current)
+      console.log(this._isPriceFiltered())
       var priceRange = ''
       $.each(this.options.values, function(index, range) {
         minOfRange = range.value.split('-')[0] !== '' ? range.value.split('-')[0] : Number(range.value.split('-')[1]) -10
@@ -37,9 +58,7 @@ define([
           priceRange += range.value + '_'
         }
       });
-      setTimeout(function(){
-        window.location.href = current + suffix + 'price='+ priceRange
-      },10);
+      window.location.href = current + suffix + 'price='+ priceRange
     },
   
     /**
@@ -118,19 +137,7 @@ define([
       }
       return cleanedUrl;
     },
-  
-    /**
-     * Event listener to change range from inputs
-     */
-  
-    _onInputChange: function () {
-      $('.price-range-input').bind('input', function() {
-         $('#slider-price').slider({
-           values: [ $('#min-price').val(), $('#max-price').val()]
-         });
-      });
-    },
-  
+    
     /**
      * Set starting values
      * @param min
@@ -145,7 +152,6 @@ define([
     /**
      * Set custom current range instead of default ranges in selected filters box
      * //TODO: translate
-     * @private
      */
     
     _setCurrentRange () {
@@ -153,7 +159,6 @@ define([
       if (range !== null) {
         $('#selected-price-range').html('Da ' + range[0] + '€ a ' + range[1] +'€')
       }
-      
     },
   
     /**
@@ -173,7 +178,8 @@ define([
           $widget._setInputValues(ui.values[0],ui.values[1])
         },
         change: function( event, ui ) {
-          $widget._goToFilteredView(ui.values[0],ui.values[1])
+          $(".go-to-price").show()
+          // $widget._goToFilteredView(ui.values[0],ui.values[1])
         }
       })
     }
