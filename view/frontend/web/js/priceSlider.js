@@ -157,7 +157,7 @@ define([
     _setCurrentRange () {
       var range = this._getSelectedRange()
       if (range !== null) {
-        $('#selected-price-range').html('Da ' + range[0] + '€ a ' + range[1] +'€')
+        $('#selected-price-range').html('Da ' + range[0] + '&euro a ' + range[1] +'&euro')
       }
     },
   
