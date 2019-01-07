@@ -156,8 +156,9 @@ define([
     
     _setCurrentRange () {
       var range = this._getSelectedRange()
+      var currency = this.options.currency
       if (range !== null) {
-        $('#selected-price-range').html('Da ' + range[0] + '&euro a ' + range[1] +'&euro')
+        $('#selected-price-range').html('Da ' + range[0] + currency + ' a ' + range[1] + currency)
       }
     },
   
