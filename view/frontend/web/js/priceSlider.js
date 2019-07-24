@@ -6,7 +6,7 @@ define([
 ], function($){
   $.widget('bitbull.priceSlider', {
     
-    _init: function() {
+    _init: function () {
       var range = this._getSelectedRange()
       this.onEventListeners()
       this._setCurrentRange() // Set current price range if filter is active
@@ -66,7 +66,7 @@ define([
      * @returns {*}
      */
     
-    _getSelectedRange() {
+    _getSelectedRange: function () {
       var values = this.options.values,
           selectedRange = []
       if (this._isPriceFiltered())  {
@@ -109,7 +109,7 @@ define([
      * @returns {boolean}
      */
   
-    _isPriceFiltered() {
+    _isPriceFiltered: function () {
       var params = window.location.search
       return params.indexOf('price=')>= 0
     },
@@ -154,7 +154,7 @@ define([
      * //TODO: translate
      */
     
-    _setCurrentRange () {
+    _setCurrentRange: function () {
       var range = this._getSelectedRange()
       var currency = this.options.currency
       if (range !== null) {
@@ -189,4 +189,3 @@ define([
   
   return $.bitbull.priceSlider;
 });
-
