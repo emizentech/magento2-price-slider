@@ -26,32 +26,34 @@
 var price_url = "<?=$url;?>";
 require([
     'jquery',
+    'Magento_Catalog/js/price-utils',
     "jquery/ui",
     'domReady!'
-], function($){
-//     `use strict`;
-    console.log("Price Slider..!");
-//require(["jquery" , "jquery/jquery-ui"], function($){
-    // ...
+], function($, priceUtils){
+    updateLabel = function() {
+        var priceFormat = <?php /* @escapeNotVerified */ echo $this->helper('Magento\Tax\Helper\Data')->getPriceFormat($block->getStore()); ?>;
+        var min = priceUtils.formatPrice($( "#price-slider" ).slider( "values", 0 ), priceFormat);
+        var max = priceUtils.formatPrice($( "#price-slider" ).slider( "values", 1 ), priceFormat);
+        $( "#amount" ).val(min + " - " + max);
+    };
+
     $("div#price-slider").slider({
-			range: true,
-			min: <?=$range['min']?>,
-			max: <?=$range['max']?>,
-			values: [ <?=$range['min']?>, <?=$range['max']?> ],
-			slide: function( event, ui ) {
-				$( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
-			},
-			change: function( event, ui ) {
-				//alert(ui.values[0]+"~"+ui.values[1]);
-				window.location.href = price_url+ui.values[0]+"-"+ui.values[1];
-			}
-		});
-		$( "#amount" ).val( "$" + $( "#price-slider" ).slider( "values", 0 ) +
-			" - $" + $( "#price-slider" ).slider( "values", 1 ) );
+        range: true,
+        min: <?=$range['min']?>,
+        max: <?=$range['max']?>,
+        values: [ <?=$range['min']?>, <?=$range['max']?> ],
+        slide: function( event, ui ) {
+            updateLabel();
+        },
+        change: function( event, ui ) {
+            window.location.href = price_url+ui.values[0]+"-"+ui.values[1];
+        }
+    });
+    updateLabel();
 });
 </script>
-<?php 
-?>      
+<?php
+?>
 <p>
 	<label for="amount">Price range:</label>
 	<input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
