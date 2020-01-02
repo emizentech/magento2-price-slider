@@ -1,0 +1,25 @@
+& when (@media-common = true) {
+ #slider-price {
+   clear: both;
+ }
+ .filter-price-error,
+ .trigger-filter-price {
+   display: none;
+   text-align: center;
+   padding: 10px 0;
+   &.visible {
+     display: block;
+   }
+ }
+ .filter-price-error  {
+   color: red;
+ }
+ input#min-price,
+ input#max-price {
+   padding: 0 3px;
+   text-align: center;
+   margin-bottom: 10px;
+   max-width: 40px;
+   margin: 0 5px 10px;
+ }
+}
