@@ -2,7 +2,7 @@
     "name": "emizentech/priceslider",
     "description": "price_slider for category list page",
     "require": {
-      "php": "~5.5.0|~5.6.0|~7.1.0|~7.2.0|"
+      "php": "~5.5.0|~5.6.0|~7.1.0|~7.2.0"
     },
     "type": "magento2-module",
     "version": "0.74.0-beta4",
